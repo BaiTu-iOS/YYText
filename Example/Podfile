@@ -1,0 +1,18 @@
+plugin 'cocoapods-publish'
+
+# 开启二进制模式
+baitu_use_frameworks!
+
+use_frameworks!
+
+platform :ios, '11.4'
+
+target 'YYText_Example' do
+  pod 'YYText', :path => '../', :dev => 1
+
+  target 'YYText_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end

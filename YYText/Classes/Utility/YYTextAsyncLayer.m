@@ -226,27 +226,28 @@ static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
         UIGraphicsImageRendererFormat *format = [[UIGraphicsImageRendererFormat alloc] init];
         format.opaque = self.opaque;
         format.scale = self.contentsScale;
+        __weak typeof(self) weakSelf = self;
         UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:self.bounds.size format:format];
         UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
             CGContextRef context = rendererContext.CGContext;
-            if (self.opaque) {
-                CGSize size = self.bounds.size;
-                size.width *= self.contentsScale;
-                size.height *= self.contentsScale;
+            if (weakSelf.opaque) {
+                CGSize size = weakSelf.bounds.size;
+                size.width *= weakSelf.contentsScale;
+                size.height *= weakSelf.contentsScale;
                 CGContextSaveGState(context); {
-                    if (!self.backgroundColor || CGColorGetAlpha(self.backgroundColor) < 1) {
+                    if (!weakSelf.backgroundColor || CGColorGetAlpha(weakSelf.backgroundColor) < 1) {
                         CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
                         CGContextAddRect(context, CGRectMake(0, 0, size.width, size.height));
                         CGContextFillPath(context);
                     }
-                    if (self.backgroundColor) {
-                        CGContextSetFillColorWithColor(context, self.backgroundColor);
+                    if (weakSelf.backgroundColor) {
+                        CGContextSetFillColorWithColor(context, weakSelf.backgroundColor);
                         CGContextAddRect(context, CGRectMake(0, 0, size.width, size.height));
                         CGContextFillPath(context);
                     }
                 } CGContextRestoreGState(context);
             }
-            task.display(context, self.bounds.size, ^{return NO;});
+            task.display(context, weakSelf.bounds.size, ^{return NO;});
         }];
         self.contents = (__bridge id)(image.CGImage);
         if (task.didDisplay) task.didDisplay(self, YES);

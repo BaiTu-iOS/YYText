@@ -483,7 +483,14 @@ static int _YYTextKeyboardViewFrameObserverKey;
     _hasObservedChange = NO;
     _fromFrame = trans.toFrame;
     _fromVisible = trans.toVisible;
-    _fromOrientation = app.statusBarOrientation;
+    if (@available(iOS 13.0, *)) {
+        // 使用键盘所属窗口的方向；窗口尚未关联 Scene 时不猜测其他 Scene 的方向。
+        UIWindowScene *windowScene = window.windowScene;
+        _fromOrientation = windowScene ? windowScene.interfaceOrientation : UIInterfaceOrientationUnknown;
+    } else {
+        // 兼容尚未引入 UIWindowScene 的系统。
+        _fromOrientation = app.statusBarOrientation;
+    }
 }
 
 - (CGRect)convertRect:(CGRect)rect toView:(UIView *)view {
